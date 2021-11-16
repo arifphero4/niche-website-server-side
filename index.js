@@ -16,7 +16,35 @@ async function run () {
     try {
         await client.connect()
         const database = client.db('camera_product');
-        const usersCollection = database.collection('users');
+        const productsCollection = database.collection('products');
+
+
+
+        // app products post
+        app.post('/products', async (req, res) => {
+            const product =req.body;
+            console.log('hit the post api', product);
+            
+
+            const result = await productsCollection.insertOne(product);
+            console.log(result);
+            res.json(result)
+        });
+
+
+        // get all products
+        app.get('/addToProducts', async(req, res) => {
+            const cursor = productsCollection.find({});
+            const products = await cursor.toArray();
+            res.send(products);
+        })
+        // get limited products
+        app.get('/limitProducts', async(req, res) => {
+            const cursor = productsCollection.find({}).limit(6);
+            const products = await cursor.toArray();
+            res.send(products);
+        })
+
 
     }
     finally {
