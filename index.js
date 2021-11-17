@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
+const ObjectId= require('mongodb').ObjectId;
 const admin = require("firebase-admin");
 const { MongoClient } = require('mongodb');
 const port= process.env.PORT || 5000;
@@ -45,6 +46,7 @@ async function run () {
         const database = client.db('camera_product');
         const productsCollection = database.collection('products');
         const usersCollection = database.collection('users');
+        const ordersCollection = database.collection('orders');
 
 
 
@@ -59,6 +61,20 @@ async function run () {
             res.json(result)
         });
 
+        // post product Order
+        app.post('/orders', async(req, res) => {
+            const product = req.body;
+            const result= await ordersCollection.insertOne(product)
+            res.json(result);
+        });
+
+        // get product order
+        app.get('/orders', async(req, res) => {
+            const cursor = ordersCollection.find({});
+            const orders = await cursor.toArray();
+            res.send(orders);
+        })
+
 
         // get all products
         app.get('/addToProducts', async(req, res) => {
@@ -72,6 +88,14 @@ async function run () {
             const products = await cursor.toArray();
             res.send(products);
         });
+
+        //get Order 
+        app.get('/addToProducts/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id:ObjectId(id)};
+            const product = await productsCollection.findOne(query);
+            res.json(product);
+        })
 
         //check admin
         app.get('/users/:email', async (req, res) => {
