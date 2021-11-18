@@ -47,6 +47,7 @@ async function run () {
         const productsCollection = database.collection('products');
         const usersCollection = database.collection('users');
         const ordersCollection = database.collection('orders');
+        const reviewCollection = database.collection('review');
 
 
 
@@ -74,6 +75,35 @@ async function run () {
             const orders = await cursor.toArray();
             res.send(orders);
         })
+        
+        //post user review
+        app.post('/userReview', async(req, res) =>{
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            console.log(result);
+            res.send(result);
+        })
+
+        // get add review
+        app.get('/infoReview', async(req, res) =>{
+            const result = await reviewCollection.find({}).toArray();
+            res.send(result);
+        })
+
+        //delete orders
+        app.delete('/orders/:id',async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await ordersCollection.deleteOne(query);
+            res.json(result);
+        });
+        //delete products
+        app.delete('/addToProducts/:id',async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await productsCollection.deleteOne(query);
+            res.json(result);
+        });
 
 
         // get all products
